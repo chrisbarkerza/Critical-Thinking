@@ -5,7 +5,11 @@
       "WebFetch(domain:critical-thinking.co.za)",
       "Bash(python3:*)",
       "Bash(git remote set-url:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
