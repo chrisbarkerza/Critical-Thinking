@@ -9,7 +9,16 @@
       "Bash(git push:*)",
       "Bash(mv:*)",
       "Bash(rmdir:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rm:*)",
+      "Bash(git submodule:*)",
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(find:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": []
   }
