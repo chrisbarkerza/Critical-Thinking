@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI in Schools: Strategic Analysis Dashboard</title>
+    <!-- CDN Libraries for enhanced functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.0.8/dist/countUp.umd.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #3182ce 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating particles background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(10px) rotate(-1deg); }
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #1e3a5f, #3182ce, #d4af37);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            animation: gradientShift 3s ease-in-out infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0) scale(1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:nth-child(1) {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+        }
+
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #2c5282 0%, #3182ce 100%);
+        }
+
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #3182ce 0%, #d4af37 100%);
+        }
+
+        .stat-card:nth-child(4) {
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .tab-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-container:hover {
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #1e3a5f, #d4af37);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-50%);
+        }
+
+        .tab-button:hover {
+            color: #1e3a5f;
+            background: rgba(30, 58, 95, 0.05);
+        }
+
+        .tab-button:hover::before {
+            width: 80%;
+        }
+
+        .tab-button.active {
+            color: #1e3a5f;
+            background: rgba(30, 58, 95, 0.1);
+        }
+
+        .tab-button.active::before {
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #1e3a5f;
+        }
+
+        .question-title {
+            font-size: 1.3em;
+            color: #1e3a5f;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .insight-box {
+            background: linear-gradient(135deg, #1e3a5f 0%, #3182ce 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .insight-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h3,
+        .chart-container h4 {
+            margin-bottom: 20px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .bar-label {
+            width: 300px;
+            font-size: 0.9em;
+            font-weight: 500;
+            text-align: left;
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+
+        .bar {
+            height: 25px;
+            background: linear-gradient(90deg, #1e3a5f 0%, #d4af37 100%);
+            border-radius: 12px;
+            position: relative;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #1e3a5f;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1e3a5f;
+            margin-bottom: 5px;
+        }
+
+        .metric-description {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #fff2cc 0%, #d4af37 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .recommendation-title {
+            font-weight: bold;
+            color: #8b6914;
+            margin-bottom: 10px;
+        }
+
+        .bullet-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .bullet-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .bullet-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #1e3a5f;
+            font-weight: bold;
+        }
+
+        .phase-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .phase-card {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .phase-1 { background: linear-gradient(135deg, #1e3a5f, #2c5282); }
+        .phase-2 { background: linear-gradient(135deg, #2c5282, #3182ce); }
+        .phase-3 { background: linear-gradient(135deg, #3182ce, #d4af37); }
+
+        .phase-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .comparison-chart {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .comparison-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .comparison-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1e3a5f;
+        }
+
+        .comparison-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .vs {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>GenAI in Schools: Strategic Analysis Dashboard</h1>
+            <p>Comprehensive analysis of 112 responses from SAHETI School staff (May 2025)</p>
+            
+            <div class="header-stats">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-number counter" data-target="112">0</div>
+                    <div class="stat-label">Total Responses</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-number counter" data-target="87.5" data-suffix="%">0%</div>
+                    <div class="stat-label">Use ChatGPT</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-number counter" data-target="36.7" data-prefix="+">+0</div>
+                    <div class="stat-label">Net Positive Sentiment</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-number counter" data-target="99.7" data-suffix="%">0%</div>
+                    <div class="stat-label">Data Completeness</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('overview')">Overview</button>
+                <button class="tab-button" onclick="showTab('strategic')">Strategic & Policy (Q1-Q3)</button>
+                <button class="tab-button" onclick="showTab('teaching')">Teaching & Learning (Q4-Q6)</button>
+                <button class="tab-button" onclick="showTab('organizational')">Organizational (Q7-Q9)</button>
+                <button class="tab-button" onclick="showTab('predictive')">Predictive & Trends (Q10-Q12)</button>
+                <button class="tab-button" onclick="showTab('implementation')">Implementation (Q13-Q15)</button>
+                <button class="tab-button" onclick="showTab('recommendations')">Recommendations</button>
+            </div>
+
+            <div id="overview" class="tab-content active">
+                <div class="question-section" data-aos="fade-up">
+                    <h2>Executive Summary</h2>
+                    
+                    <div class="insight-box" data-aos="fade-right" data-aos-delay="100">
+                        <div class="insight-title">🎯 Key Finding: Exceptional Readiness</div>
+                        Your school demonstrates one of the highest GenAI literacy rates in education, with 87.5% ChatGPT adoption and strong positive sentiment across all stakeholder groups.
+                    </div>
+
+                    <div class="metric-grid">
+                        <div class="metric-card" data-aos="flip-left" data-aos-delay="100">
+                            <div class="metric-value counter" data-target="82.1" data-suffix="%">0%</div>
+                            <div class="metric-description">Academic Staff Respondents</div>
+                        </div>
+                        <div class="metric-card" data-aos="flip-left" data-aos-delay="200">
+                            <div class="metric-value counter" data-target="17.9" data-suffix="%">0%</div>
+                            <div class="metric-description">Non-teaching Staff Respondents</div>
+                        </div>
+                        <div class="metric-card" data-aos="flip-left" data-aos-delay="300">
+                            <div class="metric-value counter" data-target="67.4" data-suffix="%">0%</div>
+                            <div class="metric-description">Teachers Already Use AI for Teaching</div>
+                        </div>
+                        <div class="metric-card" data-aos="flip-left" data-aos-delay="400">
+                            <div class="metric-value counter" data-target="68" data-suffix="%">0%</div>
+                            <div class="metric-description">Request Formal Training</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container" data-aos="fade-up" data-aos-delay="200">
+                        <h3>Top 5 GenAI Tools by Adoption</h3>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="toolsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="comparison-chart" data-aos="zoom-in" data-aos-delay="300">
+                        <div class="comparison-item">
+                            <div class="comparison-value counter" data-target="62.0" data-suffix="%">0%</div>
+                            <div class="comparison-label">Agree with Benefits</div>
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="comparison-item">
+                            <div class="comparison-value counter" data-target="25.2" data-suffix="%">0%</div>
+                            <div class="comparison-label">Agree with Concerns</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="strategic" class="tab-content">
+                <div class="question-section">
+                    <div class="question-title">Q1: Current GenAI Adoption Landscape</div>
+                    <p><strong>Finding:</strong> The school has achieved near-universal ChatGPT adoption (87.5%) with significant penetration of education-specific tools.</p>
+                    
+                    <div class="chart-container">
+                        <h4>Tool Adoption by Category</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">General AI (ChatGPT)</div>
+                                <div class="bar" style="width: 87.5%;">87.5%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Social AI (Meta AI)</div>
+                                <div class="bar" style="width: 54.5%;">54.5%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Education AI (Mindjoy)</div>
+                                <div class="bar" style="width: 37.5%;">37.5%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Enterprise AI (Copilot)</div>
+                                <div class="bar" style="width: 25%;">25.0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">Strategic Insight</div>
+                        High adoption rates indicate excellent readiness for institutional implementation. Staff are already experienced users rather than beginners.
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q2: Implementation Priorities</div>
+                    <p><strong>Finding:</strong> Content creation and curriculum planning show highest acceptance among teachers, while administrative departments show strong universal support.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">88.0%</div>
+                            <div class="metric-description">Support Content Creation Tools</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">85.9%</div>
+                            <div class="metric-description">Support Curriculum Planning</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-description">Marketing Dept Support</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">95%</div>
+                            <div class="metric-description">IT Dept Support</div>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-box">
+                        <div class="recommendation-title">Priority Implementation Areas</div>
+                        <ul class="bullet-list">
+                            <li>Start with content creation tools for teachers</li>
+                            <li>Implement curriculum planning support systems</li>
+                            <li>Focus on marketing and IT department applications</li>
+                            <li>Defer assessment tools until policy frameworks established</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q3: Risk vs Benefit Perception</div>
+                    <p><strong>Finding:</strong> Staff are significantly more optimistic than concerned, with a +36.7 percentage point net positive sentiment.</p>
+                    
+                    <div class="comparison-chart">
+                        <div class="comparison-item">
+                            <div class="comparison-value">73.2%</div>
+                            <div class="comparison-label">Improved Efficiency</div>
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="comparison-item">
+                            <div class="comparison-value">42.9%</div>
+                            <div class="comparison-label">Ethical Concerns</div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">Strategic Insight</div>
+                        While technical barriers are minimal (2.7%), ethical concerns require policy attention. The strong positive sentiment provides excellent foundation for change management.
+                    </div>
+                </div>
+            </div>
+
+            <div id="teaching" class="tab-content">
+                <div class="question-section">
+                    <div class="question-title">Q4: Teacher Empowerment vs Student Dependency</div>
+                    <p><strong>Finding:</strong> Teachers who use AI for their own work show significantly higher support for student access.</p>
+                    
+                    <div class="comparison-chart">
+                        <div class="comparison-item">
+                            <div class="comparison-value">78.5%</div>
+                            <div class="comparison-label">AI-Using Teachers Support Student Access</div>
+                        </div>
+                        <div class="vs">VS</div>
+                        <div class="comparison-item">
+                            <div class="comparison-value">52.3%</div>
+                            <div class="comparison-label">Non-AI Teachers Support</div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">Key Insight</div>
+                        +26.2 percentage point gap demonstrates that experiential learning drives cultural change. Teachers who experience benefits become advocates.
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q5: Learning Enhancement vs Academic Integrity</div>
+                    <p><strong>Finding:</strong> Teachers see significant learning benefits but have legitimate concerns about misuse.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">71.8%</div>
+                            <div class="metric-description">Believe in Learning Benefits</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">58.4%</div>
+                            <div class="metric-description">Concerned About Abuse</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">+13.4</div>
+                            <div class="metric-description">Net Optimism Points</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">67.4%</div>
+                            <div class="metric-description">Worry About Over-reliance</div>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-box">
+                        <div class="recommendation-title">Implementation Requirements</div>
+                        <ul class="bullet-list">
+                            <li>Develop robust academic integrity frameworks</li>
+                            <li>Create digital literacy education programs</li>
+                            <li>Establish clear usage guidelines for students</li>
+                            <li>Implement monitoring and support systems</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q6: Pedagogical Transformation Pathway</div>
+                    <p><strong>Finding:</strong> AI-using teachers become champions for broader adoption, creating viral transformation pattern.</p>
+                    
+                    <div class="chart-container">
+                        <h4>Student Access Support by Teacher AI Experience</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">Personalized Learning (AI Users)</div>
+                                <div class="bar" style="width: 82%; background: linear-gradient(90deg, #1e3a5f 0%, #d4af37 100%);">82%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Personalized Learning (Non-Users)</div>
+                                <div class="bar" style="width: 58%; background: linear-gradient(90deg, #5a6c8a 0%, #a67c52 100%);">58%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Study Materials (AI Users)</div>
+                                <div class="bar" style="width: 79%; background: linear-gradient(90deg, #1e3a5f 0%, #d4af37 100%);">79%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Study Materials (Non-Users)</div>
+                                <div class="bar" style="width: 61%; background: linear-gradient(90deg, #5a6c8a 0%, #a67c52 100%);">61%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">Culture Change Pathway</div>
+                        Clear evidence that experiential professional development drives cultural transformation. Use current AI users as mentors and champions.
+                    </div>
+                </div>
+            </div>
+
+            <div id="organizational" class="tab-content">
+                <div class="question-section">
+                    <div class="question-title">Q7: Department-Specific Needs Analysis</div>
+                    <p><strong>Finding:</strong> Academic and administrative needs are complementary, allowing for phased implementation.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">Academic</div>
+                            <div class="metric-description">Content Creation, Curriculum Planning, Student Communication</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">Administrative</div>
+                            <div class="metric-description">Document Processing, Data Analysis, Meeting Management</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q8: Implementation Barriers</div>
+                    <p><strong>Finding:</strong> Barriers are primarily cultural and policy-related rather than technical.</p>
+                    
+                    <div class="chart-container">
+                        <h4>Barrier Concern Levels</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">Ethical Issues</div>
+                                <div class="bar" style="width: 42.9%;">42.9%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Job Security</div>
+                                <div class="bar" style="width: 32.1%;">32.1%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Quality/Reliability</div>
+                                <div class="bar" style="width: 23.2%;">23.2%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Technical Implementation</div>
+                                <div class="bar" style="width: 2.7%;">2.7%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-box">
+                        <div class="recommendation-title">Barrier Mitigation Strategy</div>
+                        <ul class="bullet-list">
+                            <li>Develop comprehensive ethics and governance frameworks</li>
+                            <li>Implement change management programs addressing job security</li>
+                            <li>Provide quality assurance training and tool selection guidance</li>
+                            <li>Leverage low technical barriers for rapid deployment</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q9: Support Requirements</div>
+                    <p><strong>Finding:</strong> Staff want structured support rather than independent exploration.</p>
+                    
+                    <div class="chart-container">
+                        <h4>Top Support Requests</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">Training & PD</div>
+                                <div class="bar" style="width: 68%;">68%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">License Support</div>
+                                <div class="bar" style="width: 45%;">45%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Approved Tools List</div>
+                                <div class="bar" style="width: 34%;">34%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Policy Guidelines</div>
+                                <div class="bar" style="width: 28%;">28%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="predictive" class="tab-content">
+                <div class="question-section">
+                    <div class="question-title">Q10: High User Characteristics</div>
+                    <p><strong>Finding:</strong> IT proficiency and experiential exposure are stronger predictors than role or experience.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">89%</div>
+                            <div class="metric-description">High Users Have Advanced IT Skills</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">95%</div>
+                            <div class="metric-description">Started with ChatGPT</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">67%</div>
+                            <div class="metric-description">Non-Users Have Basic IT Skills</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">Mixed</div>
+                            <div class="metric-description">Age/Experience Not Predictive</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q11: Tool Promise for Education</div>
+                    <p><strong>Finding:</strong> Hybrid approach combining popular general tools with specialized education platforms shows most promise.</p>
+                    
+                    <div class="chart-container">
+                        <h4>Education-Specific Tool Performance</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">Mindjoy (Education)</div>
+                                <div class="bar" style="width: 37.5%;">37.5%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">MagicSchool</div>
+                                <div class="bar" style="width: 9.8%;">9.8%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Khanmigo</div>
+                                <div class="bar" style="width: 7.1%;">7.1%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q12: Meta AI Adoption Potential</div>
+                    <p><strong>Finding:</strong> High organic adoption through social platforms suggests Meta AI will become prevalent in informal communications.</p>
+                    
+                    <div class="comparison-chart">
+                        <div class="comparison-item">
+                            <div class="comparison-value">54.5%</div>
+                            <div class="comparison-label">Current Meta AI Users</div>
+                        </div>
+                        <div class="vs">→</div>
+                        <div class="comparison-item">
+                            <div class="comparison-value">45%</div>
+                            <div class="comparison-label">Plan WhatsApp Use</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="implementation" class="tab-content">
+                <div class="question-section">
+                    <div class="question-title">Q13: Readiness Gaps</div>
+                    <p><strong>Finding:</strong> Policy and governance frameworks lag significantly behind technical readiness and user interest.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">68%</div>
+                            <div class="metric-description">Need Academic Integrity Guidelines</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">52%</div>
+                            <div class="metric-description">Need Data Privacy Protocols</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">47%</div>
+                            <div class="metric-description">Need Tool Approval Process</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">45%</div>
+                            <div class="metric-description">Need License Management</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q14: Learning Preferences</div>
+                    <p><strong>Finding:</strong> Strong preference for formal, structured training indicates readiness for comprehensive professional development.</p>
+                    
+                    <div class="chart-container">
+                        <h4>Professional Development Preferences</h4>
+                        <div class="bar-chart">
+                            <div class="bar-item">
+                                <div class="bar-label">Formal Training</div>
+                                <div class="bar" style="width: 68%;">68%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Mixed Approach</div>
+                                <div class="bar" style="width: 34%;">34%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Peer Learning</div>
+                                <div class="bar" style="width: 23%;">23%</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Self-Directed</div>
+                                <div class="bar" style="width: 15%;">15%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-section">
+                    <div class="question-title">Q15: Cultural Transformation Signals</div>
+                    <p><strong>Finding:</strong> The school is experiencing fundamental shift toward AI-augmented work practices with high satisfaction driving organic expansion.</p>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">67%</div>
+                            <div class="metric-description">Academic Staff Integrate AI into Teaching</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">78%</div>
+                            <div class="metric-description">Report AI Makes Work Easier/Faster</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">82%</div>
+                            <div class="metric-description">Plan to Increase AI Usage</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">89%</div>
+                            <div class="metric-description">Early Adopters Have Positive Experience</div>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">Transformation Evidence</div>
+                        High satisfaction rates (89% positive for early adopters) are driving organic expansion across all age groups and departments, indicating fundamental cultural shift in progress.
+                    </div>
+                </div>
+            </div>
+
+            <div id="recommendations" class="tab-content">
+                <div class="question-section">
+                    <h2>Strategic Implementation Roadmap</h2>
+                    
+                    <div class="phase-container">
+                        <div class="phase-card phase-1">
+                            <div class="phase-title">Phase 1: Foundation (0-3 months)</div>
+                            <ul class="bullet-list" style="color: white;">
+                                <li>Develop comprehensive GenAI policy framework</li>
+                                <li>Launch structured training programs</li>
+                                <li>Establish approved tools list with licenses</li>
+                                <li>Create academic integrity guidelines</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="phase-card phase-2">
+                            <div class="phase-title">Phase 2: Pilot Programs (3-6 months)</div>
+                            <ul class="bullet-list" style="color: white;">
+                                <li>Implement content creation tool pilots</li>
+                                <li>Deploy curriculum planning support</li>
+                                <li>Launch administrative efficiency programs</li>
+                                <li>Establish peer mentoring network</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="phase-card phase-3">
+                            <div class="phase-title">Phase 3: Full Integration (6-12 months)</div>
+                            <ul class="bullet-list" style="color: white;">
+                                <li>Roll out comprehensive department integration</li>
+                                <li>Implement continuous PD programs</li>
+                                <li>Develop competency standards</li>
+                                <li>Establish innovation leadership position</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="insight-box">
+                        <div class="insight-title">Success Metrics to Track</div>
+                        <ul class="bullet-list" style="color: white;">
+                            <li>User satisfaction and productivity improvements</li>
+                            <li>Policy compliance and academic integrity maintenance</li>
+                            <li>Student learning outcome enhancements</li>
+                            <li>Institutional competitive advantage in education innovation</li>
+                        </ul>
+                    </div>
+
+                    <div class="recommendation-box">
+                        <div class="recommendation-title">Competitive Advantage Opportunity</div>
+                        Your data shows positioning to become a leading AI-integrated school. The combination of high adoption rates (87.5%), positive sentiment (+36.7 points), and clear implementation priorities provides a blueprint for systematic rollout that could set educational standards.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 100
+        });
+
+        // Enhanced tab switching with animations
+        function showTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            
+            // Hide all tab contents with fade out
+            tabContents.forEach(content => {
+                if (content.classList.contains('active')) {
+                    content.style.opacity = '0';
+                    content.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        content.classList.remove('active');
+                    }, 200);
+                }
+            });
+
+            // Remove active class from all buttons
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content with fade in
+            setTimeout(() => {
+                const selectedTab = document.getElementById(tabName);
+                selectedTab.classList.add('active');
+                selectedTab.style.opacity = '0';
+                selectedTab.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    selectedTab.style.opacity = '1';
+                    selectedTab.style.transform = 'translateY(0)';
+                }, 50);
+            }, 200);
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Animated Counter Function
+        function animateCounter(element) {
+            const target = parseFloat(element.dataset.target);
+            const prefix = element.dataset.prefix || '';
+            const suffix = element.dataset.suffix || '';
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function for smooth animation
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = target * easeOut;
+                
+                element.textContent = prefix + current.toFixed(target % 1 === 0 ? 0 : 1) + suffix;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+            
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Initialize Chart.js for Tools Adoption
+        function initToolsChart() {
+            const ctx = document.getElementById('toolsChart');
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ChatGPT', 'Meta AI', 'Mindjoy', 'Copilot', 'NotebookLM'],
+                    datasets: [{
+                        label: 'Adoption Rate (%)',
+                        data: [87.5, 54.5, 37.5, 25.0, 14.3],
+                        backgroundColor: [
+                            'rgba(30, 58, 95, 0.8)',
+                            'rgba(44, 82, 130, 0.8)',
+                            'rgba(49, 130, 206, 0.8)',
+                            'rgba(212, 175, 55, 0.8)',
+                            'rgba(184, 134, 11, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(30, 58, 95, 1)',
+                            'rgba(44, 82, 130, 1)',
+                            'rgba(49, 130, 206, 1)',
+                            'rgba(212, 175, 55, 1)',
+                            'rgba(184, 134, 11, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutCubic'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x + '% adoption rate';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize everything on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize counters with intersection observer
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+                        entry.target.classList.add('animated');
+                        animateCounter(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            // Observe all counter elements
+            document.querySelectorAll('.counter').forEach(counter => {
+                counterObserver.observe(counter);
+            });
+
+            // Initialize Chart.js charts
+            setTimeout(() => {
+                initToolsChart();
+            }, 500);
+
+            // Enhanced hover effects with subtle animations
+            const cards = document.querySelectorAll('.metric-card, .stat-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                    this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add stagger animation to charts when they come into view
+            const chartObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bars = entry.target.querySelectorAll('.bar');
+                        bars.forEach((bar, index) => {
+                            setTimeout(() => {
+                                bar.style.transform = 'scaleX(1)';
+                                bar.style.transformOrigin = 'left';
+                                bar.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                            }, index * 150);
+                        });
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            document.querySelectorAll('.bar-chart').forEach(chart => {
+                // Initially hide bars
+                chart.querySelectorAll('.bar').forEach(bar => {
+                    bar.style.transform = 'scaleX(0)';
+                });
+                chartObserver.observe(chart);
+            });
+        });
+    </script>
+</body>
+</html>
