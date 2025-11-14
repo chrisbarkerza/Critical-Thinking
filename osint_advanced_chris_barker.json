@@ -1,0 +1,61 @@
+{
+  "email": "chris.barker@futureforesight.com",
+  "gravatar_profiles": [
+    {
+      "display_name": "Chris Barker",
+      "profile_url": "https://gravatar.com/futureforesight",
+      "thumbnail": "https://2.gravatar.com/avatar/832f7f35d5a6d8003fe424993f4daba6",
+      "accounts": [
+        {
+          "type": "linkedin",
+          "url": "https://www.linkedin.com/in/chris-barker"
+        },
+        {
+          "type": "github",
+          "url": "https://github.com/chrisbarkerza"
+        }
+      ]
+    }
+  ],
+  "clearbit_info": {
+    "logo_url": "https://logo.clearbit.com/futureforesight.com"
+  },
+  "email_reputation": {},
+  "domain_analysis": {
+    "domain": "futureforesight.com",
+    "mx_records": [],
+    "txt_records": [],
+    "spf_record": null,
+    "dmarc_record": null
+  },
+  "additional_searches": [
+    {
+      "platform": "GitHub Code",
+      "url": "https://github.com/search?q=chris.barker%40futureforesight.com&type=code"
+    },
+    {
+      "platform": "GitHub Users",
+      "url": "https://github.com/search?q=chris.barker%40futureforesight.com&type=users"
+    },
+    {
+      "platform": "Pipl",
+      "url": "https://pipl.com/search/?q=chris.barker%40futureforesight.com"
+    },
+    {
+      "platform": "Pastebin Dumps",
+      "url": "https://psbdmp.ws/?q=chris.barker%40futureforesight.com"
+    },
+    {
+      "platform": "EmailHippo",
+      "url": "https://tools.emailhippo.com/email/chris.barker%40futureforesight.com"
+    },
+    {
+      "platform": "Verify Email",
+      "url": "https://verify-email.org/"
+    },
+    {
+      "platform": "Hunter Email Verifier",
+      "url": "https://hunter.io/email-verifier/chris.barker%40futureforesight.com"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "primary_email": "chris.barker@futureforesight.com",
+  "timestamp": "2025-11-14T02:06:43.530612",
+  "discovered_emails": [],
+  "breach_info": [],
+  "social_profiles": [
+    {
+      "platform": "LinkedIn",
+      "potential_url": "https://www.linkedin.com/search/results/people/?keywords=chris+barker"
+    },
+    {
+      "platform": "Twitter/X",
+      "potential_url": "https://twitter.com/chris.barker"
+    },
+    {
+      "platform": "GitHub",
+      "potential_url": "https://github.com/chris.barker"
+    },
+    {
+      "platform": "Medium",
+      "potential_url": "https://medium.com/@chris.barker@futureforesight.com"
+    },
+    {
+      "platform": "Dev.to",
+      "potential_url": "https://dev.to/chris.barker"
+    },
+    {
+      "platform": "Reddit",
+      "potential_url": "https://www.reddit.com/user/chris.barker"
+    }
+  ],
+  "domain_emails": [],
+  "patterns": [
+    "cbarker@protonmail.com",
+    "chris_barker@futureforesight.com",
+    "cbarker@hotmail.com",
+    "chrisbarker@hotmail.com",
+    "chris.barker@outlook.com",
+    "barker.chris@futureforesight.com",
+    "chrisbarker@gmail.com",
+    "cbarker@gmail.com",
+    "chrisbarker@yahoo.com",
+    "chrisbarker@protonmail.com",
+    "chrisbarker@outlook.com",
+    "chris.barker@protonmail.com",
+    "chrisbarker@futureforesight.com",
+    "chris.barker@gmail.com",
+    "cbarker@outlook.com",
+    "chris.barker@yahoo.com",
+    "cbarker@futureforesight.com",
+    "chris.b@futureforesight.com",
+    "chris@futureforesight.com",
+    "cbarker@yahoo.com"
+  ],
+  "google_dorks": [
+    "\"chris.barker@futureforesight.com\"",
+    "\"chris barker\" email",
+    "site:futureforesight.com \"chris barker\"",
+    "intext:\"chris.barker@futureforesight.com\"",
+    "\"chris.barker@\" OR \"chris@\""
+  ]
+}
